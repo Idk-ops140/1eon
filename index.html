@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>13ON</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0f7e7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #7ed957;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+        .container {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 800px;
+        }
+        .post {
+            background-color: #ffffff;
+            border: 1px solid #d0e0d0;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .post textarea {
+            width: 100%;
+            height: 100px;
+            border-radius: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        .post button {
+            background-color: #7ed957;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .post button:hover {
+            background-color: #6acb4b;
+        }
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+        .like-button {
+            background-color: #ffffff;
+            color: #7ed957;
+            border: 1px solid #7ed957;
+            cursor: pointer;
+            border-radius: 5px;
+            padding: 5px 10px;
+        }
+        .like-button.liked {
+            color: #ffffff;
+            background-color: #7ed957;
+        }
+        .rules-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #7ed957;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to 13ON</h1>
+        <p>Post anything anonymously and see what others have to say.</p>
+    </header>
+
+    <div class="container">
+        <div class="post">
+            <textarea id="postContent" placeholder="What would you like to say?"></textarea><br>
+            <button onclick="submitPost()">Post</button>
+        </div>
+
+        <div id="postsContainer">
+            <!-- Posts will be loaded here dynamically -->
+        </div>
+
+        <a href="rules.html" class="rules-link">See the Rules</a>
+    </div>
+
+    <script>
+        // Retrieve posts and likes from localStorage
+        const postsData = JSON.parse(localStorage.getItem('posts')) || [];
+        const likesData = JSON.parse(localStorage.getItem('likes')) || {};
+
+        // Function to render posts
+        function renderPosts() {
+            const postsContainer = document.getElementById('postsContainer');
+            postsContainer.innerHTML = ''; // Clear previous posts
+
+            postsData.forEach((post, index) => {
+                const postDiv = document.createElement('div');
+                postDiv.classList.add('post');
+                postDiv.innerHTML = `
+                    <p>${post.content}</p>
+                    <div class="post-footer">
+                        <button class="like-button ${likesData[index] ? 'liked' : ''}" onclick="toggleLike(${index})">
+                            Like (${likesData[index] ? '1' : '0'})
+                        </button>
+                    </div>
+                `;
+                postsContainer.appendChild(postDiv);
+            });
+        }
+
+        // Function to submit a new post
+        function submitPost() {
+            const postContent = document.getElementById('postContent').value;
+            if (postContent.trim() !== '') {
+                postsData.push({ content: postContent });
+                localStorage.setItem('posts', JSON.stringify(postsData));
+                renderPosts(); // Re-render posts after submission
+                document.getElementById('postContent').value = ''; // Clear input
+            }
+        }
+
+        // Function to toggle like status
+        function toggleLike(postIndex) {
+            likesData[postIndex] = !likesData[postIndex];
+            localStorage.setItem('likes', JSON.stringify(likesData));
+            renderPosts(); // Re-render posts after liking
+        }
+
+        // Initial render of posts
+        renderPosts();
+    </script>
+</body>
+</html>
